@@ -17,10 +17,11 @@ public:
 private:
     
     // Setup member functions
+    bool gameLoop();
     void printMenu();
     void readInBoard();
     void printBoard(int board[9][9]);
-    int getUserMove();
+    char getUserMove();
     std::string selectFile();
     void copyBoard(int to_copy[9][9], int new_board[9][9]);
 
@@ -39,12 +40,12 @@ private:
     int getHorizontalIndex(char number);
     void printExitMessage(bool game_won);
 
-
     // Member variables
     int game_board[9][9];
     int solved_board[9][9];
     int starter_board[9][9];
     bool game_over;
+    bool game_won;
     bool solution_possible;
     int num_moves;
     int num_hints;

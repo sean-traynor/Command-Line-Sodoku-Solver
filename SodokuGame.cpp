@@ -5,54 +5,65 @@ SodokuGame::SodokuGame() {
     this->num_moves = 0;
     this->num_hints = 3;
     this->steps_to_solve = 0;
-    this->printMenu();
-    this->readInBoard();
-    this->copyBoard(this->game_board, this->starter_board);
-    this->copyBoard(this->game_board, this->solved_board);
-    this->solution_possible = this->solveGame();
 }
 
 void SodokuGame::playGame() {
+    this->printMenu();
+    this->readInBoard();
+    
+    this->copyBoard(this->game_board, this->starter_board);
+    this->copyBoard(this->game_board, this->solved_board);
+    
+    this->solution_possible = this->solveGame();
+    if (!this->solution_possible) {
+        std::cerr << "\nThis puzzle is invalid, please try again with another puzzle.\n\n";
+        exit(EXIT_FAILURE);
+    }
 
+    this->game_won = this->gameLoop();
+
+    if (game_won) {
+        this->printBoard(this->game_board);
+        this->printExitMessage(true);
+    } else this->printExitMessage(false);
+}
+
+bool SodokuGame::gameLoop() {
     while (!this->game_over) {
         this->printBoard(this->game_board);
-        int query = this->getUserMove();
-        
-        this->num_moves++;
+        char query = this->getUserMove();
 
-        if (query == 1) this->addNumber();
-        else if (query == 2) this->removeNumber();
-        else if (query == 3) this->giveHint();
-        else if (query == 4) this->resetGame();
-        else if (query == 5) {
+        if (query == '1') this->addNumber();
+        else if (query == '2') this->removeNumber();
+        else if (query == '3') this->giveHint();
+        else if (query == '4') this->resetGame();
+        else if (query == '5') {
             this->printBoard(this->solved_board);
-            this->printExitMessage(false);
-            return;
-        } else if (query == 6) {
-            this->printExitMessage(false);
-            return;
+            std::cout << "The algorithm solved the board in " << this->steps_to_solve << " steps.\n\n";
+            return false;
+        } else if (query == 'q') return false;
+        else {
+            std::cout << "Invalid query, please try again.\n";
+            continue;
         }
+        this->num_moves++;
 
         int row, col;
         this->game_over = this->boardSolved(this->game_board);
-        
-        if (this->game_over) {
-            this->printBoard(this->game_board);
-            this->printExitMessage(true);
-        }
     }
+    return true;
 }
 
-int SodokuGame::getUserMove() {
+char SodokuGame::getUserMove() {
     std::cout << "What would you like to do?\n";
     std::cout << "1. Add Number\n";
     std::cout << "2. Remove Number\n";
     std::cout << "3. Get Hint\n";
     std::cout << "4. Start Over\n";
     std::cout << "5. Show Solution\n";
-    std::cout << "6. Exit\n\n\n";
+    std::cout << "Quit Game ('q')\n\n\n";
 
-    int move;
+    char move;
     std::cin >> move;
     std::cout << "\n";
 
@@ -93,15 +104,24 @@ std::string SodokuGame::selectFile() {
     std::cout << "1. Easy\n";
     std::cout << "2. Medium\n";
     std::cout << "3. Hard\n\n";
+    std::cout << "... or you can attempt the World's Hardest Sodoku Puzzle (4)\n\n\n\n";
+
 
     int difficulty;
     std::cin >> difficulty;
-    
+
+    if (difficulty == 4) return "impossible.txt";
+
     std::cout << "\n";
     std::cout << "Which level would you like to play (1, 2, or 3)? ";
     
     int level;
     std::cin >> level;
+
+    if (difficulty > 3 || difficulty < 1 || level > 3 || level < 1) {
+        std::cout << "\nThe file you specified is out of range. Please try again.\n\n";
+        return this->selectFile();
+    }
 
     int file_index = (difficulty - 1) * 3 + level - 1;
 
@@ -112,7 +132,7 @@ std::string SodokuGame::selectFile() {
 
 void SodokuGame::printMenu() {
 
-    std::cout << "\n\n\n";
+    std::cout << "\n\n";
 
     std::cout << "Welcome to the Command-Line Sodoku Game!!\n";
     std::cout << "This game was developed by Sean Traynor (Tufts University '23).\n\n";
@@ -127,7 +147,7 @@ void SodokuGame::readInBoard() {
     infile.open("game_files/" + filename);
     
     if (!infile.is_open()) {
-        std::cerr << "Error Opening File. Please Try Again.\n";
+        std::cerr << "Error Opening File. Please Try Again.\n\n";
         exit(EXIT_FAILURE);
     }
     
@@ -153,6 +173,12 @@ void SodokuGame::addNumber() {
     
     int number;
     std::cin >> number;
+
+    if (number > 9 || number < 1) {
+        std::cout << "\nThe number you have added is out of range. Please try again.\n\n";
+        addNumber();
+        return;
+    }
 
     std::string user_index;
     std::cout << "Where would you like the " << number << " to go ('A1', 'B2', etc.)? ";
@@ -194,6 +220,7 @@ bool SodokuGame::solveGame() {
     if (!empty_found) return true;
 
     for (int i = 1; i <= 9; i++) {
+        this->steps_to_solve++;
         if (validPosition(i, row, col)) {
             this->solved_board[row][col] = i;
 
