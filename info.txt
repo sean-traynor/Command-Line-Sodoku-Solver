@@ -1,6 +1,0 @@
-1. Setup the 'Home Screen' of the game
-2. Read in the file and store into the data structure
-3. Print the initial instance of the board
-4. Create prompts for the user to play (Add, Remove, Solve, Quit)
-5. Create backtracking solve algorithm
-6. End Game when user has completed

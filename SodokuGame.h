@@ -1,3 +1,12 @@
+/*
+ * Written By: Sean Traynor (https://github.com/sean-traynor)
+ * Last Updated: 11/16/20
+ *
+ * Description: This class creates an instance of a Sodoku Game that can be played completely on the Command-Line.
+ *              The user can choose to play the game or see the solution of the game (which the program solves using
+ *              a backtracking algorithm). This algorithm solves the Sodoku Puzzle in O(n^2) time.
+ */
+
 #include <iostream>
 #include <stdlib.h>
 #include <fstream>
@@ -7,10 +16,11 @@
 
 const static std::string FILES[] = {"easy1.txt", "easy2.txt", "easy3.txt",
                             "medium1.txt", "medium2.txt", "medium3.txt",
-                            "hard1.txt", "hard2.txt", "hard3.txt"};
+                            "hard1.txt", "hard2.txt", "hard3.txt", "impossible.txt"};
 
 class SodokuGame {
 public:    
+    
     SodokuGame();
     void playGame();
 
@@ -39,6 +49,8 @@ private:
     int getVerticalIndex(char letter);
     int getHorizontalIndex(char number);
     void printExitMessage(bool game_won);
+    bool validAddition(int num, int row, int col);
+    bool validRemoval(int row, int col);
 
     // Member variables
     int game_board[9][9];
@@ -50,6 +62,7 @@ private:
     int num_moves;
     int num_hints;
     int steps_to_solve;
+
 };
 
 #endif
